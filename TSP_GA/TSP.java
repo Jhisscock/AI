@@ -84,11 +84,12 @@ public class TSP{
         for(int[] array : parents) {
             System.out.println(Arrays.toString(array));
         }
+        System.out.println();
 
         //Step 4: Choose two random parents and apply crossover
         Random rand = new Random();
         List<int[]> prevMated = new ArrayList<int[]>();
-        population.clear();
+        List<int[]> newPopulation = new ArrayList<int[]>();
         while(prevMated.size() < 6){
             int p1 = rand.nextInt(4);
             int p2 = rand.nextInt(4);
@@ -112,14 +113,16 @@ public class TSP{
             int[] newOrder = crossOver(parents.get(p1), parents.get(p2));
 
             //Step 5: Mutate
-            int[]array = mutate(newOrder, 0.2, cities);
-            population.add(array);
+            int [] newPop = mutate(newOrder, 0.2, cities);
+            System.out.println();
+            System.out.println(Arrays.toString(newPop));
+            newPopulation.add(newPop);
         }
         for(int[] array : prevMated) {
             System.out.println(Arrays.toString(array));
         }
-        for(int[] array : population) {
-            System.out.println(Arrays.toString(array));
+        for(int i = 0; i < newPopulation.size(); i++){
+            System.out.println(Arrays.toString(newPopulation.get(i)));
         }
     }
 
@@ -201,7 +204,8 @@ public class TSP{
                 }
             }
         }
-        System.out.println(Arrays.toString(p2));
+        //System.out.println(Arrays.toString(p2));
+        //System.out.println();
         return p2;
     }
 
