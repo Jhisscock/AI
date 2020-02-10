@@ -12,9 +12,9 @@ public class TSP{
 
     Step 5. Apply mutation operators for minor changes in the results. --done
 
-    Step 6. Repeat Steps  4 and 5 until all parents are selected and mated.
+    Step 6. Repeat Steps  4 and 5 until all parents are selected and mated. --done
 
-    Step 7. Replace old population of chromosomes with new one.
+    Step 7. Replace old population of chromosomes with new one. --done
 
     Step 8. Evaluate the fitness of each chromosome in the new population.
 
@@ -50,81 +50,88 @@ public class TSP{
         List<int[]> population = new ArrayList<int[]>();
         createPopulation(order, population);
 
-        //Step 2: Get fitness
-        double [] fitness = new double[cities];
-        getFitness(fitness, population, cities, distanceArray);
-        System.out.println(Arrays.toString(fitness));
-        
-        //Step 3: Proportional selection
-        List<int[]> parents = new ArrayList<int[]>();
-        int t1 = proportionalSelection(fitness);
-        int [] newParent1 = population.get(t1);
-        parents.add(newParent1);
+        //Step 2: Get fitness, and start looping through new generations
+        int count = 0;
+        while(count < 100){
+            double [] fitness = new double[population.size()];
+            getFitness(fitness, population, distanceArray);
+            
+            //Step 3: Proportional selection
+            List<int[]> parents = getNewParents((int)Math.ceil(cities/2), population);
+            int t1 = proportionalSelection(fitness);
+            int [] newParent1 = population.get(t1);
+            parents.add(newParent1);
 
-        int t2 = proportionalSelection(fitness);
-        while(t2 == t1){
-            t2 = proportionalSelection(fitness);
-        }
-        int [] newParent2 = population.get(t2);
-        parents.add(newParent2);
-
-        int t3 =proportionalSelection(fitness);
-        while(t3 == t2 || t3 == t1){
-            t3 =proportionalSelection(fitness);
-        }
-        int [] newParent3 = population.get(t3);
-        parents.add(newParent3);
-
-        int t4 = proportionalSelection(fitness);
-        while(t4 == t3 || t4 == t2 || t4 == t1){
-            t4 = proportionalSelection(fitness);
-        }
-        int [] newParent4 = population.get(t4);
-        parents.add(newParent4);
-        for(int[] array : parents) {
-            System.out.println(Arrays.toString(array));
-        }
-        System.out.println();
-
-        //Step 4: Choose two random parents and apply crossover
-        Random rand = new Random();
-        List<int[]> prevMated = new ArrayList<int[]>();
-        List<int[]> newPopulation = new ArrayList<int[]>();
-        while(prevMated.size() < 6){
-            int p1 = rand.nextInt(4);
-            int p2 = rand.nextInt(4);
-            while(p2 == p1){
-                p2 = rand.nextInt(4);
+            int t2 = proportionalSelection(fitness);
+            while(t2 == t1){
+                t2 = proportionalSelection(fitness);
             }
-            int [] tmp = {p1, p2};
-            int [] tmp2 = {p2, p1};
-            while(isInList(prevMated, tmp) || isInList(prevMated, tmp2)){
-                p1 = rand.nextInt(4);
-                p2 = rand.nextInt(4);
-                while(p2 == p1){
-                    p2 = rand.nextInt(4);
+            int [] newParent2 = population.get(t2);
+            parents.add(newParent2);
+
+            int t3 =proportionalSelection(fitness);
+            while(t3 == t2 || t3 == t1){
+                t3 =proportionalSelection(fitness);
+            }
+            int [] newParent3 = population.get(t3);
+            parents.add(newParent3);
+
+            int t4 = proportionalSelection(fitness);
+            while(t4 == t3 || t4 == t2 || t4 == t1){
+                t4 = proportionalSelection(fitness);
+            }
+            int [] newParent4 = population.get(t4);
+            parents.add(newParent4);
+
+            //Step 4: Choose two random parents and apply crossover
+            Random rand = new Random();
+            List<int[]> prevMated = new ArrayList<int[]>();
+            population.clear();
+            while(prevMated.size() < Math.ceil(cities/2)){
+                int sum = 0;
+                for(int i = 0; i < Math.ceil(cities/2); i++){
+                    sum += i+1;
                 }
-                tmp[0] = p1;
-                tmp[1] = p2;
-                tmp2[0] = p2;
-                tmp2[1] = p1;
-            }
-            prevMated.add(tmp);
-            int[] newOrder = crossOver(parents.get(p1), parents.get(p2));
+                int p1 = rand.nextInt(sum);
+                int p2 = rand.nextInt(sum);
+                while(p2 == p1){
+                    p2 = rand.nextInt(sum);
+                }
+                int [] tmp = {p1, p2};
+                int [] tmp2 = {p2, p1};
+                while(isInList(prevMated, tmp) || isInList(prevMated, tmp2)){
+                    p1 = rand.nextInt(sum);
+                    p2 = rand.nextInt(sum);
+                    while(p2 == p1){
+                        p2 = rand.nextInt(sum);
+                    }
+                    tmp[0] = p1;
+                    tmp[1] = p2;
+                    tmp2[0] = p2;
+                    tmp2[1] = p1;
+                }
+                prevMated.add(tmp);
+                int[] newOrder = crossOver(parents.get(p1), parents.get(p2));
 
-            //Step 5: Mutate
-            int [] newPop = mutate(newOrder, 0.2, cities);
-            System.out.println();
-            System.out.println(Arrays.toString(newPop));
-            newPopulation.add(newPop);
+                //Step 5: Mutate
+                int [] newPop = mutate(newOrder, 0.2, cities);
+                population.add(newPop);
+            }
+            count++;
+            System.out.println(Arrays.toString(fitness));
         }
-        for(int[] array : prevMated) {
-            System.out.println(Arrays.toString(array));
+        double [] fitness = new double[population.size()];
+        getFitness(fitness, population, distanceArray);
+        double max = -9999999;
+        int index = 0;
+        for(int i = 0; i < population.size(); i++){
+            if(fitness[i] > max){
+                max = fitness[i];
+                index = i;
+            }
         }
-        for(int i = 0; i < newPopulation.size(); i++){
-            System.out.println(Arrays.toString(newPopulation.get(i)));
-        }
-    }
+        System.out.println(Arrays.toString(population.get(index)));
+    }   
 
     public static List<int[]> createPopulation(int [] order, List<int[]> population){
         for(int i = 0; i < order.length; i++){
@@ -145,7 +152,7 @@ public class TSP{
 		return array;
     }
 
-    public static int getDistance(List<int[]> population,int cities, int [][] distance, int i){
+    public static int getDistance(List<int[]> population, int [][] distance, int i){
         int sum = 0;
         int [] tmp = population.get(i);
         for(int j = 0; j < tmp.length; j++){
@@ -158,19 +165,33 @@ public class TSP{
         return sum;
     }
 
-    public static double [] getFitness(double [] fitness, List<int[]> population, int cities, int [][] distance){
+    public static double [] getFitness(double [] fitness, List<int[]> population, int [][] distance){
         //Get distances for orders in population
         double tmp = 0;
-        for(int i = 0; i < cities; i++){
-            tmp = getDistance(population, cities, distance, i);
+        sumOfDistance = 0;
+        for(int i = 0; i < fitness.length; i++){
+            tmp = getDistance(population, distance, i);
             sumOfDistance += tmp;
             fitness[i] = tmp;
         }
-        for(int i = 0; i < cities; i++){
+        for(int i = 0; i < fitness.length; i++){
             fitness[i] = fitness[i] / sumOfDistance;
             tmpSum += fitness[i];
         }
         return fitness;
+    }
+
+    public static List<int[]> getNewParents(int numOfParents, List<int[]> population, double [] fitness){
+        List<int[]> parents = new ArrayList<int[]>();
+        int count = 0;
+        while(count < numOfParents){
+            int tmp = proportionalSelection(fitness);
+            if(!isInList(parents, population.get(tmp))){
+                parents.add(population.get(tmp));
+                count++;
+            }
+        }
+        return parents;
     }
 
     public static int proportionalSelection(double [] fitness){
@@ -204,8 +225,6 @@ public class TSP{
                 }
             }
         }
-        //System.out.println(Arrays.toString(p2));
-        //System.out.println();
         return p2;
     }
 
