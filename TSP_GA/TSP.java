@@ -49,21 +49,18 @@ public class TSP{
         //Step 1: Create starting population
         List<int[]> population = new ArrayList<int[]>();
         createPopulation(order, population);
+        for(int i = 0; i < population.size(); i++){
+            System.out.print(getDistance(population, distanceArray, i) + " : ");
+        }
 
         //Step 2: Get fitness, and start looping through new generations
-        double [] fitness = new double[population.size()];
-        getFitness(fitness, population, distanceArray);
+        double [] fitness = getFitness(population, distanceArray);
+        System.out.println(Arrays.toString(fitness) + "\n");
         boolean fitnessConverge = true;
+        int count = 0;
         while(fitnessConverge){
-            for(int i = 0; i < fitness.length; i++){
-                if(fitness[0] != fitness[i]){
-                    break;
-                }else if(i == fitness.length-1){
-                    fitnessConverge = false;
-                }
-            } 
             //Step 3: Proportional selection
-            List<int[]> parents = getNewParents((int)Math.ceil((double)population.size() * 0.75), population, fitness);
+            List<int[]> parents = getNewParents(population.size(), population, fitness);
 
             //Step 4/6: Choose two random parents and apply crossover
             Random rand = new Random();
@@ -103,14 +100,30 @@ public class TSP{
             }
             //Step 7: Replace old population with new population
             population = tmpPop;
-            getFitness(fitness, population, distanceArray);
+            for(int i = 0; i < population.size(); i++){
+                System.out.print(getDistance(population, distanceArray, i) + " : ");
+            }
+
+            //Step 8: Calculate new fitness
+            fitness = getFitness(population, distanceArray);
+            System.out.println(Arrays.toString(fitness));
+
+            //Step 9: Check to see if upper bounds has been met
+            for(int i = 0; i < fitness.length; i++){
+                if(fitness[0] != fitness[i]){
+                    break;
+                }else if(i == fitness.length-1){
+                    fitnessConverge = false;
+                }
+            }
+            count++; 
         }
-        getFitness(fitness, population, distanceArray);
         double max = -9999999;
         int index = 0;
         for(int i = 0; i < population.size(); i++){
-            if(fitness[i] > max){
-                max = fitness[i];
+            double tmp = getDistance(population, distanceArray, i);
+            if(tmp > max){
+                max = tmp;
                 index = i;
             }
         }
@@ -120,20 +133,24 @@ public class TSP{
 
     public static List<int[]> createPopulation(int [] order, List<int[]> population){
         for(int i = 0; i < order.length; i++){
-            RandomizeArray(order);
-            population.add(order.clone());   
+            int[]tmp  = RandomizeArray(order);
+            while(isInList(population, tmp)){
+                tmp = RandomizeArray(order);
+            }
+            population.add(tmp.clone());   
         }
         return population;
     }
 
     public static int[] RandomizeArray(int[] array){
-		Random rand = new Random();
+        Random rand = new Random();
 		for (int i=0; i<array.length; i++) {
 		    int randomPosition = rand.nextInt(array.length);
 		    int tmp = array[i];
 		    array[i] = array[randomPosition];
 		    array[randomPosition] = tmp;
-		}
+        }
+        System.out.println(Arrays.toString(array) + "\n");
 		return array;
     }
 
@@ -150,20 +167,21 @@ public class TSP{
         return sum + distance[tmp[0]][tmp[tmp.length-1]];
     }
 
-    public static double [] getFitness(double [] fitness, List<int[]> population, double [][] distance){
+    public static double [] getFitness(List<int[]> population, double [][] distance){
         //Get distances for orders in population
         double tmp = 0;
-        sumOfDistance = 0;
-        for(int i = 0; i < fitness.length; i++){
+        double []tmpFitness = new double[population.size()];
+        sumOfDistance = 0.0;
+        for(int i = 0; i < population.size(); i++){
             tmp = getDistance(population, distance, i);
             sumOfDistance += tmp;
-            fitness[i] = tmp;
+            tmpFitness[i] = tmp;
         }
-        for(int i = 0; i < fitness.length; i++){
-            fitness[i] = fitness[i] / sumOfDistance;
-            tmpSum += fitness[i];
+        for(int i = 0; i < tmpFitness.length; i++){
+            tmpFitness[i] = 1 - (tmpFitness[i] / sumOfDistance);
+            tmpSum += tmpFitness[i];
         }
-        return fitness;
+        return tmpFitness;
     }
 
     public static List<int[]> getNewParents(int numOfParents, List<int[]> population, double [] fitness){
@@ -177,9 +195,16 @@ public class TSP{
     public static int proportionalSelection(double [] fitness){
         Random rand = new Random();
         double tmp = rand.nextDouble();
-        int count = 0;
+        int count = 0;  
+        int sum = 0;
+        double [] cubeArray = new double[fitness.length];
+        for(int i = 0; i <  fitness.length; i++){
+            cubeArray[i] = Math.pow(fitness[i], 3);
+            sum += cubeArray[i];
+        }
+        tmp *= sum;
         while(tmp >= 0){
-            tmp = tmp - fitness[count];
+            tmp = tmp - cubeArray[count];
             count++;
         }
         count--;
