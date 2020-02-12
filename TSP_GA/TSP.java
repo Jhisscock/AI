@@ -47,25 +47,28 @@ public class TSP{
         }
 
         //Step 1: Create starting population
-        List<int[]> population = new ArrayList<int[]>();
-        createPopulation(order, population);
-        for(int i = 0; i < population.size(); i++){
-            System.out.print(getDistance(population, distanceArray, i) + " : ");
+        PopulationControl population = new PopulationControl();
+        population.createPopulation(order, population.getPopulation());
+        for(int i = 0; i < population.getPopulation().size(); i++){
+            System.out.print(getDistance(population.getPopulation(), distanceArray, i) + " : ");
         }
 
         //Step 2: Get fitness, and start looping through new generations
-        double [] fitness = getFitness(population, distanceArray);
+        double [] fitness = getFitness(population.getPopulation(), distanceArray);
         System.out.println(Arrays.toString(fitness) + "\n");
         boolean fitnessConverge = true;
         int count = 0;
+        List<NewPopulation> newPop = new ArrayList<NewPopulation>();
+        NewPopulation crossMutate = new NewPopulation();
         while(fitnessConverge){
             //Step 3: Proportional selection
-            List<int[]> parents = getNewParents(population.size(), population, fitness);
+            List<int[]> parents = getNewParents(population.getPopulation().size(), population.getPopulation(), fitness);
 
             //Step 4/6: Choose two random parents and apply crossover
             Random rand = new Random();
             List<int[]> prevMated = new ArrayList<int[]>();
-            List<int[]> tmpPop = new ArrayList<int[]>();
+            int j = 0;
+            newPop = new ArrayList<NewPopulation>();
             while(prevMated.size() < parents.size()){
                 int p1 = rand.nextInt(parents.size());
                 int p2 = rand.nextInt(parents.size());
@@ -89,23 +92,29 @@ public class TSP{
                 //Adding the new mated pair to be compared later
                 prevMated.add(tmp);
 
-                //Applying crossover
-                int[] newOrder = crossOver(parents.get(p1), parents.get(p2));
+                crossMutate = new NewPopulation();
 
-                //Step 5: Mutate
-                int [] newPop = mutate(newOrder, 0.5, cities);
+                //Step 4/5: Crossover and Mutate
+                crossMutate = new NewPopulation();
+                crossMutate.mutate(crossMutate.crossOver(parents.get(p1), parents.get(p2)), 0.5, cities);
 
                 //Adding current child into the new population
-                tmpPop.add(newPop);
+                newPop.add(crossMutate);
+                System.out.println(Arrays.toString(newPop.get(j).getMutate()));
+                j++;
             }
             //Step 7: Replace old population with new population
-            population = tmpPop;
-            for(int i = 0; i < population.size(); i++){
-                System.out.print(getDistance(population, distanceArray, i) + " : ");
+            population = new PopulationControl();
+            for(int i = 0; i < newPop.size(); i++){
+                System.out.println(Arrays.toString(newPop.get(i).getMutate()));
             }
-
+            for(int i = 0; i < newPop.size(); i++){
+                population.getPopulation().add(newPop.get(i).getMutate());
+                System.out.println(Arrays.toString(population.getPopulation().get(i)));
+            }
+            count++;
             //Step 8: Calculate new fitness
-            fitness = getFitness(population, distanceArray);
+            fitness = getFitness(population.getPopulation(), distanceArray);
             System.out.println(Arrays.toString(fitness));
 
             //Step 9: Check to see if upper bounds has been met
@@ -120,39 +129,18 @@ public class TSP{
         }
         double max = -9999999;
         int index = 0;
-        for(int i = 0; i < population.size(); i++){
-            double tmp = getDistance(population, distanceArray, i);
+        for(int i = 0; i < population.getPopulation().size(); i++){
+            double tmp = getDistance(population.getPopulation(), distanceArray, i);
             if(tmp > max){
                 max = tmp;
                 index = i;
             }
         }
-        System.out.println(Arrays.toString(population.get(index)));
-        System.out.println(getDistance(population, distanceArray, index));
+        System.out.println(Arrays.toString(population.getPopulation().get(index)));
+        System.out.println(getDistance(population.getPopulation(), distanceArray, index));
     }   
 
-    public static List<int[]> createPopulation(int [] order, List<int[]> population){
-        for(int i = 0; i < order.length; i++){
-            int[]tmp  = RandomizeArray(order);
-            while(isInList(population, tmp)){
-                tmp = RandomizeArray(order);
-            }
-            population.add(tmp.clone());   
-        }
-        return population;
-    }
-
-    public static int[] RandomizeArray(int[] array){
-        Random rand = new Random();
-		for (int i=0; i<array.length; i++) {
-		    int randomPosition = rand.nextInt(array.length);
-		    int tmp = array[i];
-		    array[i] = array[randomPosition];
-		    array[randomPosition] = tmp;
-        }
-        System.out.println(Arrays.toString(array) + "\n");
-		return array;
-    }
+    
 
     public static double getDistance(List<int[]> population, double [][] distance, int i){
         double sum = 0;
@@ -211,44 +199,82 @@ public class TSP{
         return count;
     }
 
-    public static int[] crossOver(int[] p1, int[]p2){
-        Random rand = new Random();
-        int start1 = rand.nextInt(Math.floorDiv(p1.length, 2) + 1);
-        int end1 = rand.nextInt((p1.length + 1 - start1)) + start1;
-        int[]tmpArray = new int[end1 - start1];
-        int count = 0;
-        for(int i = start1; i < end1; i++){
-            tmpArray[count] = p1[i];
-            count++;
-        }
-        for(int i = 0; i < tmpArray.length; i++){
-            for(int j = 0; j < p2.length; j++){
-                if(tmpArray[i] == p2[j]){
-                    int tmp = p2[j];
-                    p2[j] = p2[i];
-                    p2[i] = tmp;
-                }
-            }
-        }
-        return p2;
-    }
-
-    public static int[] mutate(int[] order, double mutationRate, int cities){
-        Random rand = new Random();
-        for(int i = 0; i < cities; i++){
-            if(rand.nextDouble() < mutationRate){
-                int index1 = rand.nextInt(order.length);
-                int index2 = rand.nextInt(order.length);
-                int tmp = order[index1];
-                order[index1] = order[index2];
-                order[index2] = tmp;
-            }
-        }
-        return order;
-    }
-
     public static boolean isInList(
         final List<int[]> list, final int[] candidate) {
         return list.stream().anyMatch(a -> Arrays.equals(a, candidate));
     }
+
+    public static class PopulationControl{
+        private ArrayList<int[]> population = new ArrayList<int[]>();
+
+        public void createPopulation(int [] order, List<int[]> population){
+            for(int i = 0; i < order.length; i++){
+                while(isInList(population, RandomizeArray(order))){
+                    RandomizeArray(order);
+                }
+                population.add(order.clone());   
+            }
+        }
+    
+        public static int[] RandomizeArray(int[] array){
+            Random rand = new Random();
+            for (int i=0; i<array.length; i++) {
+                int randomPosition = rand.nextInt(array.length);
+                int tmp = array[i];
+                array[i] = array[randomPosition];
+                array[randomPosition] = tmp;
+            }
+            System.out.println(Arrays.toString(array) + "\n");
+            return array;
+        }
+
+        public ArrayList<int[]> getPopulation(){
+            return population;
+        }
+    }
+
+    public static class NewPopulation{
+        private int [] mutate;
+
+        public int[] crossOver(int[] p1, int[]p2){
+            Random rand = new Random();
+            int start1 = rand.nextInt(Math.floorDiv(p1.length, 2) + 1);
+            int end1 = rand.nextInt((p1.length + 1 - start1)) + start1;
+            int[]tmpArray = new int[end1 - start1];
+            int count = 0;
+            for(int i = start1; i < end1; i++){
+                tmpArray[count] = p1[i];
+                count++;
+            }
+            for(int i = 0; i < tmpArray.length; i++){
+                for(int j = 0; j < p2.length; j++){
+                    if(tmpArray[i] == p2[j]){
+                        int tmp = p2[j];
+                        p2[j] = p2[i];
+                        p2[i] = tmp;
+                    }
+                }
+            }
+            return p2;
+        }
+
+        public void mutate(int[] order, double mutationRate, int cities){
+            Random rand = new Random();
+            for(int i = 0; i < cities; i++){
+                if(rand.nextDouble() < mutationRate){
+                    int index1 = rand.nextInt(order.length);
+                    int index2 = rand.nextInt(order.length);
+                    int tmp = order[index1];
+                    order[index1] = order[index2];
+                    order[index2] = tmp;
+                }
+            }
+            mutate = order;
+        }
+
+        public int[] getMutate(){
+            return mutate;
+        }
+    }
+
 }
