@@ -52,21 +52,17 @@ public class TSP{
         for(int i = 0; i < population.size(); i++){
             System.out.print(getDistance(population, distanceArray, i) + " : ");
         }
+        System.out.println();
 
         //Step 2: Get fitness, and start looping through new generations
         double [] fitness = getFitness(population, distanceArray);
         System.out.println(Arrays.toString(fitness) + "\n");
         boolean fitnessConverge = true;
         int count = 0;
-        List<int[]> parents = new ArrayList<int[]>();
         while( fitnessConverge && count < 10){
             //Step 3: Proportional selection
-            parents = new ArrayList<int[]>();
-            for(int i = 0; i < population.size(); i++){
-                System.out.print(Arrays.toString(population.get(proportionalSelection(fitness))));
-                parents.add(population.get(proportionalSelection(fitness)));
-            }
-            //System.out.println(Arrays.deepToString(parents.toArray()));
+            List<int[]> parents = proportionalSelection(fitness, population);
+            System.out.println(Arrays.deepToString(parents.toArray()));
 
             //Step 4/6: Choose two random parents and apply crossover
             Random rand = new Random();
@@ -172,31 +168,34 @@ public class TSP{
         return tmpFitness;
     }
 
-    public static List<int[]> getNewParents(int numOfParents, List<int[]> population, double [] fitness){
+    /*public static List<int[]> getNewParents(int numOfParents, List<int[]> population, double [] fitness){
         List<int[]> tmp = new ArrayList<int[]>();
         for(int i = 0; i < numOfParents; i++){
             tmp.add(population.get(proportionalSelection(fitness)));
         }
         return tmp;
-    }
+    }*/
 
-    public static int proportionalSelection(double [] fitness){
+    public static List<int[]> proportionalSelection(double [] fitness, List<int[]> population){
         Random rand = new Random();
         double tmp = rand.nextDouble();
         int count = 0;  
         int sum = 0;
+        List<int[]> tmpList = new ArrayList<int[]>();
         double [] cubeArray = new double[fitness.length];
-        for(int i = 0; i <  fitness.length; i++){
-            cubeArray[i] = Math.pow(fitness[i], 3);
-            sum += cubeArray[i];
+        for(int j = 0; j <  fitness.length; j++){
+            for(int i = 0; i <  fitness.length; i++){
+                cubeArray[i] = Math.pow(fitness[i], 3);
+                sum += cubeArray[i];
+            }
+            tmp *= sum;
+            while(tmp >= 0){
+                tmp = tmp - cubeArray[count];
+                count++;
+            }
+            tmpList.add(population.get(count--));
         }
-        tmp *= sum;
-        while(tmp >= 0){
-            tmp = tmp - cubeArray[count];
-            count++;
-        }
-        count--;
-        return count;
+        return tmpList;
     }
 
     public static boolean isInList(
@@ -223,7 +222,6 @@ public class TSP{
             array[i] = array[randomPosition];
             array[randomPosition] = tmp;
         }
-        System.out.println(Arrays.toString(array) + "\n");
         return array;
     }
 
