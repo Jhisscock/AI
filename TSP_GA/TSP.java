@@ -49,17 +49,12 @@ public class TSP{
         //Step 1: Create starting population
         PopulationControl population = new PopulationControl();
         population.createPopulation(order, population.getPopulation());
-        for(int i = 0; i < population.getPopulation().size(); i++){
-            System.out.print(getDistance(population.getPopulation(), distanceArray, i) + " : ");
-        }
 
         //Step 2: Get fitness, and start looping through new generations
         double [] fitness = getFitness(population.getPopulation(), distanceArray);
-        System.out.println(Arrays.toString(fitness) + "\n");
         boolean fitnessConverge = true;
         int count = 0;
-        List<NewPopulation> newPop = new ArrayList<NewPopulation>();
-        NewPopulation crossMutate = new NewPopulation();
+        int[][] tmpPop = new int[population.getPopulation().size()][];
         while(fitnessConverge){
             //Step 3: Proportional selection
             List<int[]> parents = getNewParents(population.getPopulation().size(), population.getPopulation(), fitness);
@@ -68,7 +63,8 @@ public class TSP{
             Random rand = new Random();
             List<int[]> prevMated = new ArrayList<int[]>();
             int j = 0;
-            newPop = new ArrayList<NewPopulation>();
+            NewPopulation newPop = new NewPopulation();
+            NewPopulation crossMutate = new NewPopulation();
             while(prevMated.size() < parents.size()){
                 int p1 = rand.nextInt(parents.size());
                 int p2 = rand.nextInt(parents.size());
@@ -92,26 +88,19 @@ public class TSP{
                 //Adding the new mated pair to be compared later
                 prevMated.add(tmp);
 
-                crossMutate = new NewPopulation();
-
                 //Step 4/5: Crossover and Mutate
                 crossMutate = new NewPopulation();
                 crossMutate.mutate(crossMutate.crossOver(parents.get(p1), parents.get(p2)), 0.5, cities);
 
                 //Adding current child into the new population
-                newPop.add(crossMutate);
-                System.out.println(Arrays.toString(newPop.get(j).getMutate()));
+                newPop.addNewPop(crossMutate.getMutate());
+                System.out.println(Arrays.deepToString(newPop.getNewPopulation().toArray()));
                 j++;
             }
             //Step 7: Replace old population with new population
             population = new PopulationControl();
-            for(int i = 0; i < newPop.size(); i++){
-                System.out.println(Arrays.toString(newPop.get(i).getMutate()));
-            }
-            for(int i = 0; i < newPop.size(); i++){
-                population.getPopulation().add(newPop.get(i).getMutate());
-                System.out.println(Arrays.toString(population.getPopulation().get(i)));
-            }
+            population.getPopulation().addAll(newPop.getNewPopulation());
+            System.out.println(Arrays.deepToString(population.getPopulation().toArray()));
             count++;
             //Step 8: Calculate new fitness
             fitness = getFitness(population.getPopulation(), distanceArray);
@@ -205,14 +194,14 @@ public class TSP{
     }
 
     public static class PopulationControl{
-        private ArrayList<int[]> population = new ArrayList<int[]>();
+        private ArrayList<int[]> pop = new ArrayList<int[]>();
 
         public void createPopulation(int [] order, List<int[]> population){
             for(int i = 0; i < order.length; i++){
                 while(isInList(population, RandomizeArray(order))){
                     RandomizeArray(order);
                 }
-                population.add(order.clone());   
+                pop.add(order.clone());   
             }
         }
     
@@ -224,17 +213,21 @@ public class TSP{
                 array[i] = array[randomPosition];
                 array[randomPosition] = tmp;
             }
-            System.out.println(Arrays.toString(array) + "\n");
             return array;
         }
 
         public ArrayList<int[]> getPopulation(){
-            return population;
+            return pop;
         }
     }
 
     public static class NewPopulation{
         private int [] mutate;
+        private ArrayList<int[]> newPopulation = new ArrayList<int[]>();
+
+        public void addNewPop(int[]newMutate){
+            newPopulation.add(newMutate);
+        }
 
         public int[] crossOver(int[] p1, int[]p2){
             Random rand = new Random();
@@ -274,6 +267,10 @@ public class TSP{
 
         public int[] getMutate(){
             return mutate;
+        }
+
+        public void getNewPopulation(ArrayList<int[]> newPopulation){
+            this.newPopulation = newPopulation;
         }
     }
 
