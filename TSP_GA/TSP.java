@@ -1,4 +1,6 @@
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class TSP{
     /*
@@ -27,6 +29,8 @@ public class TSP{
         Scanner sc = new Scanner(System.in);
 
         //Retrieve number of cities from user
+        boolean retry = true;
+        while(retry){
         System.out.print("How many cities: ");
         int cities = sc.nextInt();
         sc.nextLine();
@@ -47,6 +51,8 @@ public class TSP{
             order[i] = i;
         }
 
+        int x = 0;
+        while(x < 10){
         //Step 1: Create starting population
         ArrayList<int[]> population = createPopulation(order);
 
@@ -55,7 +61,7 @@ public class TSP{
         boolean fitnessConverge = true;
         int count = 0;
 
-        while( fitnessConverge && count < 1000){
+        while(count < 100 && fitnessConverge){
 
             //Step 3: Proportional selection
             List<int[]> parents = new ArrayList<int[]>();
@@ -90,17 +96,15 @@ public class TSP{
                 prevMated.add(tmp);
 
                 //Step 4/5: Crossover and Mutate
-                int[] crossMutate = mutate(crossOver(parents.get(p1),parents.get(p2)), 0.5, cities);
-
                 //Adding current child into the new population
-                newPop.add(crossMutate);
+                newPop.add(mutate(crossOver(parents.get(p1),parents.get(p2)), 0.25, cities));
                 j++;
             }
 
             //Step 7: Replace old population with new population
             population.clear();
             population.addAll(newPop);
-
+            
             //Step 8: Calculate new fitness
             fitness = getFitness(population, distanceArray);
 
@@ -126,12 +130,27 @@ public class TSP{
                 index = i;
             }
         }
+        try {
+            FileWriter myWriter = new FileWriter("test.txt", true);
+            myWriter.write(Arrays.toString(population.get(index)));
+            myWriter.write(String.valueOf(getDistance(population, distanceArray, index)));
+            myWriter.write("\r\n");
+            myWriter.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         System.out.println(Arrays.toString(population.get(index)));
         System.out.println(getDistance(population, distanceArray, index));
+        x++;
+    }
+    System.out.println("retry Y/N ?");
+    if(sc.nextLine().equals("N")){
+        retry = false;
+    }
+    }
     }   
 
-    
-
+    //Methods
     public static double getDistance(List<int[]> population, double [][] distance, int i){
         double sum = 0;
         int [] tmp = population.get(i);
@@ -157,7 +176,7 @@ public class TSP{
         }
         for(int i = 0; i < tmpFitness.length; i++){
             tmpFitness[i] = 1 - (tmpFitness[i] / sumOfDistance);
-            tmpFitness[i] = Math.pow(tmpFitness[i], 100.0); //Raise fitness to the power of 100 to create a larger gap between fitnesses
+            tmpFitness[i] = tmpFitness[i];//Raise fitness to the power of 100 to create a larger gap between fitnesses
             tmpSum += tmpFitness[i];
         }
         return tmpFitness;
