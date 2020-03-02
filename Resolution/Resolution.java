@@ -5,59 +5,89 @@ public class Resolution{
     public static void main (String [] args){
         Scanner sc = new Scanner(System.in);
         System.out.println("Input one clause at a time hitting enter in between each, when finished type stop");
-        List<String> clauses = new ArrayList<String>();
+        List<String> startClauses = new ArrayList<String>();
 
-        //take input and add clauses to an array list
+        //take input and add startClauses to an array list
         while(true){
             String tmp = sc.nextLine();
             if(tmp.equals("stop")){
                 break;
             }else{
-                clauses.add(tmp);
+                startClauses.add(tmp);
             }
         }
 
         //Create a list of clauses stored with their elements attached to a true or false value within an array
-        ArrayList<Clause[]> newClauses = new ArrayList<Clause[]>();
-        for(int i = 0; i < clauses.size(); i++){
+        ArrayList<Clause[]> clauses = new ArrayList<Clause[]>();
+        for(int i = 0; i < startClauses.size(); i++){
             List<Clause> temp = new ArrayList<Clause>();
-            for(int j = 0; j < clauses.get(i).length(); j++){
-                char tmp = clauses.get(i).charAt(j);
+            for(int j = 0; j < startClauses.get(i).length(); j++){
+                char tmp = startClauses.get(i).charAt(j);
                 if(tmp == ' ' || tmp == 'v'){
                     continue;
                 }else{
                     if(tmp == 170){
-                       temp.add(new Clause(false, Character.toString(clauses.get(i).charAt(j+2))));
+                       temp.add(new Clause(false, Character.toString(startClauses.get(i).charAt(j+2))));
                         j += 2;
                     }else{
-                        temp.add(new Clause(true, Character.toString(clauses.get(i).charAt(j))));
+                        temp.add(new Clause(true, Character.toString(startClauses.get(i).charAt(j))));
                     }
                 }
             }
-            newClauses.add(temp.toArray(new Clause[0]));
+            clauses.add(temp.toArray(new Clause[0]));
         }
 
-        //Resolve
-        while(!foundResolution){
+        System.out.println(PLResolution(clauses));
+        
+    }
+
+    //PL_Resolution
+    public static boolean PLResolution(ArrayList<Clause[]> clausesList){
+
+        //Main Loop
+        ArrayList<Clause[]> newClauses = new ArrayList<Clause[]>();
+        while(true){
+
+            //Find the resolvents of each pair of clauses within clausesList
             ArrayList<Clause[]> resolvents = new ArrayList<Clause[]>();
-            for(int i = 0; i < newClauses.size(); i++){
-                for(int j = 0; j < newClauses.size(); j++){
+            for(int i = 0; i < clausesList.size(); i++){
+                for(int j = 0; j < clausesList.size(); j++){
                     if(i < j){
-                        resolvents.add(PL_Resolve(newClauses.get(i), newClauses.get(j)).toArray(new Clause[0]));
+                        resolvents.add(PL_Resolve(clausesList.get(i), clausesList.get(j)).toArray(new Clause[0]));
+                        if(foundResolution){
+                            return true;
+                        }
+                    }
+                }
+            }
+            //add new resolvents to new clauses list
+            newClauses.addAll(resolvents);
+
+            //Check to see if newClauses is a subset of clausesList
+            int allClauseEqualCount = 0;
+            for(int i = 0; i < clausesList.size(); i++){
+                for(int j = 0; j < newClauses.size(); j++){
+                    int equalClauseCount = 0;
+                    for(int k = 0; k < clausesList.get(i).length; k++){
+                        for(int l = 0; l < newClauses.get(j).length; l++){
+                            if(clausesList.get(i)[k].getElement().equals(newClauses.get(j)[l].getElement()) && clausesList.get(i)[k].getTf() == newClauses.get(j)[l].getTf()){
+                                equalClauseCount++;
+                            }
+                        }
+                    }
+                    if(equalClauseCount == newClauses.get(j).length){
+                        allClauseEqualCount++;
+                    }
+                    if(allClauseEqualCount == newClauses.size()){
+                        return false;
                     }
                 }
             }
 
-            newClauses.addAll(resolvents);
+
+            //Add all new resolvents to clausesList
+            clausesList.addAll(newClauses);
         }
-        
-        for(int i = 0; i < newClauses.size(); i++){
-            for(int j = 0; j < newClauses.get(i).length; j++){
-                System.out.println(newClauses.get(i)[j].element);
-            }
-            System.out.println();
-        }
-        
     }
 
     public static ArrayList<Clause> PL_Resolve(Clause [] c1, Clause [] c2){
@@ -76,12 +106,12 @@ public class Resolution{
 
         ArrayList<Clause> tmp = new ArrayList<Clause>();
         for(int i = 0; i < c1.length; i++){
-            if(!c1Index.contains(i) && !c1Index.contains(c1[i])){
+            if(!c1Index.contains(i)){
                 tmp.add(c1[i]);
             }
         }
         for(int i = 0; i < c2.length; i++){
-            if(!c2Index.contains(i) && !c1Index.contains(c2[i])){
+            if(!c2Index.contains(i)){
                 tmp.add(c2[i]);
             }
         }
@@ -110,4 +140,5 @@ public class Resolution{
             return element;
         }
     }
+    
 }
