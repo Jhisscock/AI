@@ -325,9 +325,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.125
+    x: 0
     y: 0
-    width: 0.75
+    width: 1
     height: 1
   near clip plane: 0
   far clip plane: 1000
@@ -645,11 +645,21 @@ PrefabInstance:
         type: 3}
       propertyPath: grid
       value: 
-      objectReference: {fileID: 757072542}
+      objectReference: {fileID: 0}
     - target: {fileID: 2466477103764247604, guid: 648ccff2f69904b44a6ca7bebf104262,
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2466477103764247604, guid: 648ccff2f69904b44a6ca7bebf104262,
+        type: 3}
+      propertyPath: sqaures.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2466477103764247604, guid: 648ccff2f69904b44a6ca7bebf104262,
+        type: 3}
+      propertyPath: sqaures.Array.data[1]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6698164469503236967, guid: 648ccff2f69904b44a6ca7bebf104262,
         type: 3}
@@ -706,7 +716,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2466477103764247604, guid: 648ccff2f69904b44a6ca7bebf104262, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 648ccff2f69904b44a6ca7bebf104262, type: 3}
 --- !u!1 &1305662880 stripped
 GameObject:
@@ -727,6 +738,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 757072542}
+  emptyGridPositions: []
+  fusionFinish: 0
+  score: 0
+--- !u!114 &1305662882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305662880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6c1e5546170e44449ff859bdbfa5d2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1305662884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305662880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 083b7f2c1fafd1e4399699955cd94c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  square: {fileID: 670077948925472706, guid: fdc6168a5120bd848a416b0d3caa18af, type: 3}
+  grid: {fileID: 757072542}
+  dirLeft: 0
+  dirRight: 0
+  dirUp: 0
+  dirDown: 0
+  pieceCount: 0
 --- !u!1 &1697228270
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,6 +948,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310772, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6362091856814310792, guid: 18f607667a08ee64b88e1113177bc7a8,
         type: 3}
       propertyPath: m_Name
@@ -912,6 +962,31 @@ PrefabInstance:
         type: 3}
       propertyPath: near clip plane
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310795, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: orthographic size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310795, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: m_NormalizedViewPortRect.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310795, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: m_NormalizedViewPortRect.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310795, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: m_NormalizedViewPortRect.width
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362091856814310795, guid: 18f607667a08ee64b88e1113177bc7a8,
+        type: 3}
+      propertyPath: m_NormalizedViewPortRect.height
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18f607667a08ee64b88e1113177bc7a8, type: 3}
