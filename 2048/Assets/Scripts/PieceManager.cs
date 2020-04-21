@@ -16,6 +16,9 @@ public class PieceManager : MonoBehaviour
     public int pieceCount = 0;
     private bool canMove = true;
     private List<Vector3> previousList;
+    public bool aiComplete;
+    private GameObject [,] initialGrid = new GameObject [4,4];
+    private int count;
     void Start()
     {
         GameObject tmp = Instantiate(square, transform.position, Quaternion.identity);
@@ -28,11 +31,33 @@ public class PieceManager : MonoBehaviour
         tmp.transform.Find("Canvas/Text").transform.GetComponent<Text>().text = twoOrFour.ToString();
         tmp.transform.SetParent(grid.transform, false);
         previousList = new List<Vector3>{new Vector3(100f,100f,100f)};
+        aiComplete = true;
+        count = 0;
+        initialGrid = new GameObject[4,4];
+        foreach(Transform childTile in grid.transform){
+            if(childTile.position.x < 0 && childTile.position.y < 0){
+                int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) - 1);
+                int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) - 1);
+                initialGrid[Mathf.Abs(positionX),Mathf.Abs(positionY)] = childTile.gameObject;
+            }else if(childTile.position.x > 0 && childTile.position.y < 0){
+                int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) + 2);
+                int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) - 1);
+                initialGrid[positionX,Mathf.Abs(positionY)] = childTile.gameObject;
+            }else if(childTile.position.x < 0 && childTile.position.y > 0){
+                int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) - 1);
+                int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) + 2);
+                initialGrid[Mathf.Abs(positionX),positionY] = childTile.gameObject;
+            }else if(childTile.position.x > 0 && childTile.position.y > 0){
+                int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) + 2);
+                int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) + 2);
+                initialGrid[positionX,positionY] = childTile.gameObject;
+            }
+        }
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.LeftArrow) && canMove){
+        /*if(Input.GetKeyDown(KeyCode.LeftArrow) && canMove){
             this.GetComponent<Fusion>().GridParse(Vector2.left);
             dirLeft = true;
             canMove = false;
@@ -48,6 +73,31 @@ public class PieceManager : MonoBehaviour
             this.GetComponent<Fusion>().GridParse(Vector2.down);
             dirDown = true;
             canMove = false;
+        }*/
+
+        if(aiComplete && canMove){
+            canMove = false;
+            aiComplete = false;
+            Debug.Log("Made it");
+            Vector2 optimalMove;
+            if(count == 0){
+                optimalMove = this.GetComponent<MiniMax>().bestMove(initialGrid);
+            }else{
+                optimalMove = this.GetComponent<MiniMax>().bestMove(this.GetComponent<FusionAI>().gridPositions);
+            }
+            count++;
+            Debug.Log("Made it");
+            this.GetComponent<Fusion>().GridParse(optimalMove);
+            if(optimalMove.Equals(Vector2.left)){
+                dirLeft = true;
+            }else if(optimalMove.Equals(Vector2.right)){
+                dirRight = true;
+            }else if(optimalMove.Equals(Vector2.down)){
+                dirDown = true;
+            }else if(optimalMove.Equals(Vector2.up)){
+                dirUp = false;
+            }
+            aiComplete = true;
         }
 
         if(pieceCount == grid.transform.childCount){
@@ -69,8 +119,7 @@ public class PieceManager : MonoBehaviour
         }
         
     }
-
-    //If time permits implement check to see if there are any possible moves before ending game
+    
     public void CreatePiece(GameObject [,] piecePostion){
         List<Vector3> emptyGridPositions = new List<Vector3> {
             new Vector3 (-3.75f,-3.75f, 10f),

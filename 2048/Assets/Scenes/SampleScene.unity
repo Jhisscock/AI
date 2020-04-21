@@ -753,6 +753,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6c1e5546170e44449ff859bdbfa5d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1305662883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305662880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdc8249156533f642a6f19d2b6e2ee1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 757072542}
+  emptyGridPositions: []
+  fusionFinish: 0
+  score: 0
 --- !u!114 &1305662884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -772,6 +788,20 @@ MonoBehaviour:
   dirUp: 0
   dirDown: 0
   pieceCount: 0
+  aiComplete: 1
+--- !u!114 &1305662886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305662880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b54a8b3373c1d49acd037eeed7cee0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  square: {fileID: 670077948925472706, guid: fdc6168a5120bd848a416b0d3caa18af, type: 3}
 --- !u!1 &1697228270
 GameObject:
   m_ObjectHideFlags: 0
