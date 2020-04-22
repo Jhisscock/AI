@@ -48,7 +48,7 @@ public class MiniMax : MonoBehaviour
         
     }
 
-    public Vector2 bestMove(GameObject [,] grid){
+    public Vector2 bestMove(ref GameObject [,] grid){
         this.GetComponent<PieceManager>().aiComplete = false;
         int bestScore = int.MinValue;
         Vector2 bestMove = Vector2.zero;
@@ -59,30 +59,50 @@ public class MiniMax : MonoBehaviour
                     copyGrid[x,y] = grid[x,y];
                 }
             }
-            int mark;
+            int mark = 0;
             switch(i){
                 case 0:
                     //Move left add movement to list of moves along with its score
-                    mark = this.GetComponent<FusionAI>().GridParse(Vector2.left);
+                    if(this.GetComponent<FusionAI>().canMove(ref copyGrid, Vector2.left)){
+                        mark = this.GetComponent<FusionAI>().GridParse(Vector2.left, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.left, ref copyGrid);
+                    }else{
+                        mark = int.MinValue;
+                    }
                     break;
                 case 1:
                     //Move right
-                    mark = this.GetComponent<FusionAI>().GridParse(Vector2.right);
+                    if(this.GetComponent<FusionAI>().canMove(ref copyGrid, Vector2.right)){
+                        mark = this.GetComponent<FusionAI>().GridParse(Vector2.right, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.right, ref copyGrid);
+                    }else{
+                        mark = int.MinValue;
+                    }
                     break;
                 case 2:
                     //Move down
-                    mark = this.GetComponent<FusionAI>().GridParse(Vector2.down);
+                    if(this.GetComponent<FusionAI>().canMove(ref copyGrid, Vector2.down)){
+                        mark = this.GetComponent<FusionAI>().GridParse(Vector2.down, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.down, ref copyGrid);
+                    }else{
+                        mark = int.MinValue;
+                    }
                     break;
                 case 3:
                     //Move up
-                    mark = this.GetComponent<FusionAI>().GridParse(Vector2.up);
+                    if(this.GetComponent<FusionAI>().canMove(ref copyGrid, Vector2.up)){
+                        mark = this.GetComponent<FusionAI>().GridParse(Vector2.up, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.up, ref copyGrid);
+                    }else{
+                        mark = int.MinValue;
+                    }
                     break;
                 default:
                     mark = 0;
                     break;
             }
 
-            int currentScore = ExpectiMax(copyGrid, 4, false) + mark;
+            int currentScore = ExpectiMax(ref copyGrid, 8, false) + mark;
             if(currentScore > bestScore){
                 bestScore = currentScore;
                 switch(i){
@@ -108,16 +128,17 @@ public class MiniMax : MonoBehaviour
                 }
             }
         }
+        Debug.Log(bestScore);
         return bestMove;
     }
-    public int ExpectiMax(GameObject [,] grid, int depth , bool maxPlayer){
+    public int ExpectiMax(ref GameObject [,] grid, int depth , bool maxPlayer){
         if(depth == 0){
             return cornerHeuristic(grid);
         }
         if(maxPlayer){
             int heuristicValue = -1;
             for(int i = 0; i < 4; i++){
-                int score;
+                int score = 0;
                 GameObject [,] copyGrid = new GameObject[4,4];
                 for(int x = 0; x < 4; x++){
                     for(int y = 0; y < 4; y++){
@@ -127,25 +148,29 @@ public class MiniMax : MonoBehaviour
                 switch(i){
                     case 0:
                         //Move left add movement to list of moves along with its score
-                        score = this.GetComponent<FusionAI>().GridParse(Vector2.left);
+                        score = this.GetComponent<FusionAI>().GridParse(Vector2.left, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.left, ref copyGrid);
                         break;
                     case 1:
                         //Move right
-                        score = this.GetComponent<FusionAI>().GridParse(Vector2.right);
+                        score = this.GetComponent<FusionAI>().GridParse(Vector2.right, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.right, ref copyGrid);
                         break;
                     case 2:
                         //Move down
-                        score = this.GetComponent<FusionAI>().GridParse(Vector2.down);
+                        score = this.GetComponent<FusionAI>().GridParse(Vector2.down, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.down, ref copyGrid);
                         break;
                     case 3:
                         //Move up
-                        score = this.GetComponent<FusionAI>().GridParse(Vector2.up);
+                        score = this.GetComponent<FusionAI>().GridParse(Vector2.up, ref copyGrid);
+                        this.GetComponent<PieceMovementAi>().ShiftPieces(Vector2.up, ref copyGrid);
                         break;
                     default:
                         score = 0;
                         break;
                 }
-                int potentialMax = ExpectiMax(copyGrid, depth-1, false) + score;
+                int potentialMax = ExpectiMax(ref copyGrid, depth-1, false) + score;
                 if(potentialMax > heuristicValue){
                     heuristicValue = potentialMax;
                 }
@@ -168,22 +193,16 @@ public class MiniMax : MonoBehaviour
                         }
                     }
                 }
-                int twoOrFour;
-                if(Random.value < 0.9){
-                    twoOrFour = 2;
-                }else{
-                    twoOrFour = 4;
-                }
                 int [] newPiece = emptyPositions[i];
                 copyGrid[newPiece[0],newPiece[1]] = square;
-                copyGrid[newPiece[0],newPiece[1]].transform.Find("Canvas/Text").transform.GetComponent<Text>().text = twoOrFour.ToString();
+                copyGrid[newPiece[0],newPiece[1]].GetComponent<TileValue>().ChangeTileNum(2);
 
-                sumValue += ExpectiMax(copyGrid, depth-1, true);
+                sumValue += ExpectiMax(ref copyGrid, depth-1, true);
                 count++;
 
             }
             if(count == 0){
-                return ExpectiMax(grid, depth-1, true);
+                return ExpectiMax(ref grid, depth-1, true);
             }
             return sumValue/count;
             
@@ -192,21 +211,38 @@ public class MiniMax : MonoBehaviour
 
     public int cornerHeuristic(GameObject [,] grid){
         int score = 0;
+        int [,] bestPositionSet = new int [,] 
+        {   {0,2,4,8},
+            {16,32,64,128},
+            {256,512,1024,2048},
+            {4096,8192,16384,32768}};
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 4; j++){
                 if(grid[i,j] != null){
-                    if(i == 0 || i == 3 || j == 0 || j == 3){
-                        if((i == 0 || i == 3) && (j == 0 || j == 3)){
-                            score += 10 * int.Parse(grid[i,j].transform.Find("Canvas/Text").transform.GetComponent<Text>().text);
-                        }else{
-                            score += 5 * int.Parse(grid[i,j].transform.Find("Canvas/Text").transform.GetComponent<Text>().text);
-                        }
-                    }else{
-                        score += int.Parse(grid[i,j].transform.Find("Canvas/Text").transform.GetComponent<Text>().text);
-                    }
+                    score += bestPositionSet[i,j] * grid[i,j].GetComponent<TileValue>().GetTileNum();
                 }
             }
         }
         return score;
     }
+
+    /*public int sideHeuristic(GameObject [,] grid){
+        int score = 0;
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < 4; j++){
+                if(grid[i,j] != null){
+                    if(i == 0 || i == 3 || j == 0|| j == 3){
+                        if((i == 0 || i == 3) && (j == 0 || j == 3)){
+                            score += 10 * grid[i,j].GetComponent<TileValue>().GetTileNum();
+                        }else{
+                            score += 5 * grid[i,j].GetComponent<TileValue>().GetTileNum();
+                        }
+                    }else{
+                        score += grid[i,j].GetComponent<TileValue>().GetTileNum();
+                    }
+                }
+            }
+        }
+        return score;
+    }*/
 }

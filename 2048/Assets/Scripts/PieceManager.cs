@@ -78,15 +78,12 @@ public class PieceManager : MonoBehaviour
         if(aiComplete && canMove){
             canMove = false;
             aiComplete = false;
-            Debug.Log("Made it");
             Vector2 optimalMove;
             if(count == 0){
-                optimalMove = this.GetComponent<MiniMax>().bestMove(initialGrid);
+                optimalMove = this.GetComponent<MiniMax>().bestMove(ref initialGrid);
             }else{
-                optimalMove = this.GetComponent<MiniMax>().bestMove(this.GetComponent<FusionAI>().gridPositions);
+                optimalMove = this.GetComponent<MiniMax>().bestMove(ref this.GetComponent<Fusion>().gridPositions);
             }
-            count++;
-            Debug.Log("Made it");
             this.GetComponent<Fusion>().GridParse(optimalMove);
             if(optimalMove.Equals(Vector2.left)){
                 dirLeft = true;
@@ -95,24 +92,25 @@ public class PieceManager : MonoBehaviour
             }else if(optimalMove.Equals(Vector2.down)){
                 dirDown = true;
             }else if(optimalMove.Equals(Vector2.up)){
-                dirUp = false;
+                dirUp = true;
             }
+            count++;
             aiComplete = true;
         }
 
         if(pieceCount == grid.transform.childCount){
             pieceCount = 0;
             if(dirLeft){
-                CreatePiece(this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
                 dirLeft = false;
             }else if(dirRight){
-                CreatePiece(this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
                 dirRight = false;
             }else if(dirDown){
-                CreatePiece(this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
                 dirDown = false;
             }else if(dirUp){
-                CreatePiece(this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
                 dirUp = false;
             }
             canMove = true;
@@ -120,7 +118,7 @@ public class PieceManager : MonoBehaviour
         
     }
     
-    public void CreatePiece(GameObject [,] piecePostion){
+    public void CreatePiece(ref GameObject [,] piecePostion){
         List<Vector3> emptyGridPositions = new List<Vector3> {
             new Vector3 (-3.75f,-3.75f, 10f),
             new Vector3 (-3.75f,-1.25f, 10f),

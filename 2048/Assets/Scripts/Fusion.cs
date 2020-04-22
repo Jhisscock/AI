@@ -19,6 +19,7 @@ public class Fusion : MonoBehaviour
     public void GridParse(Vector2 direction){
         gridPositions = new GameObject[4,4];
         foreach(Transform childTile in grid.transform){
+            childTile.GetComponent<TileValue>().ChangeTileNum(int.Parse(childTile.transform.Find("Canvas/Text").GetComponent<Text>().text));
             if(childTile.position.x < 0 && childTile.position.y < 0){
                 int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) - 1);
                 int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) - 1);
@@ -40,7 +41,7 @@ public class Fusion : MonoBehaviour
 
         fusionFinish = false;
         if(direction == Vector2.left){
-            for(int y = 0; y < gridPositions.GetLength(1); y++){ // 4 2 2
+            for(int y = 0; y < gridPositions.GetLength(1); y++){ 
                 GameObject firstCompare = null;
                 GameObject secondCompare = null;
                 int count = 0;
@@ -135,7 +136,6 @@ public class Fusion : MonoBehaviour
             }
             Destroy(secondCompare.gameObject);
             score += tmp;
-            Debug.Log(score);
             return true;
         }else{
             return false;

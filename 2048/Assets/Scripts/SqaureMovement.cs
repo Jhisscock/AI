@@ -16,7 +16,7 @@ public class SqaureMovement : MonoBehaviour
 
     void Update()
     {
-        if(gameManager.GetComponent<FusionAI>().fusionFinish){
+        if(gameManager.GetComponent<Fusion>().fusionFinish){
             ShiftPieces();
         }
         

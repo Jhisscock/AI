@@ -767,7 +767,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 757072542}
   emptyGridPositions: []
-  fusionFinish: 0
+  fusionFinishAi: 0
   score: 0
 --- !u!114 &1305662884
 MonoBehaviour:
@@ -789,6 +789,18 @@ MonoBehaviour:
   dirDown: 0
   pieceCount: 0
   aiComplete: 1
+--- !u!114 &1305662885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305662880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1a2021f61db04649af4d0128a3a4584, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1305662886
 MonoBehaviour:
   m_ObjectHideFlags: 0

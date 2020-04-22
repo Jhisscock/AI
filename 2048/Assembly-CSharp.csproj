@@ -50,7 +50,9 @@
      <Compile Include="Assets\Scripts\GameOver.cs" />
      <Compile Include="Assets\Scripts\MiniMax.cs" />
      <Compile Include="Assets\Scripts\PieceManager.cs" />
+     <Compile Include="Assets\Scripts\PieceMovementAi.cs" />
      <Compile Include="Assets\Scripts\SqaureMovement.cs" />
+     <Compile Include="Assets\Scripts\TileValue.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>H:/GitHub/Pacman_Search/AI/2048/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
