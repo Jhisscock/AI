@@ -36,7 +36,7 @@ public class FusionAI : MonoBehaviour
                             }else if(count == 1){
                                 secondCompare = gridPositions[x,y];
                                 count = 0;
-                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, gridPositions)){
+                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, ref gridPositions)){
                                     x--;
                                 }
                             }
@@ -60,7 +60,7 @@ public class FusionAI : MonoBehaviour
                             }else if(count == 1){
                                 secondCompare = gridPositions[x,y];
                                 count = 0;
-                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, gridPositions)){
+                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, ref gridPositions)){
                                     x++;
                                 }
                             }
@@ -84,7 +84,7 @@ public class FusionAI : MonoBehaviour
                             }else if(count == 1){
                                 secondCompare = gridPositions[x,y];
                                 count = 0;
-                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, gridPositions)){
+                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY, direction, ref gridPositions)){
                                     y--;
                                 }
                             }
@@ -108,7 +108,7 @@ public class FusionAI : MonoBehaviour
                             }else if(count == 1){
                                 secondCompare = gridPositions[x,y];
                                 count = 0;
-                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY , direction, gridPositions)){
+                                if(!FusionCheck(firstCompare, secondCompare, x, y, firstX, firstY , direction, ref gridPositions)){
                                     y++;
                                 }
                             }
@@ -124,10 +124,10 @@ public class FusionAI : MonoBehaviour
         
     }
 
-    bool FusionCheck(int firstComapre, int secondCompare , int x, int y , int firstX, int firstY , Vector2 direction,  int [,] gridPositions){
+    bool FusionCheck(int firstComapre, int secondCompare , int x, int y , int firstX, int firstY , Vector2 direction,  ref int [,] gridPositions){
         if(firstComapre == secondCompare){
-            float tmp = firstComapre + secondCompare;
-            gridPositions[firstX, firstY] = (int)tmp;
+            int tmp = firstComapre + secondCompare;
+            gridPositions[firstX, firstY] = tmp;
             gridPositions[x,y] = 0;
             score += Mathf.Log(tmp);
             return true;

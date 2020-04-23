@@ -49,7 +49,7 @@ public class MiniMax : MonoBehaviour
     }
 
     public Vector2 bestMove( int [,] grid){
-        int n = 4;
+        int n = 6;
         this.GetComponent<PieceManager>().aiComplete = false;
         float bestScore = 0;
         Vector2 bestMove = Vector2.zero;
@@ -113,6 +113,9 @@ public class MiniMax : MonoBehaviour
     }
     public float ExpectiMax(ref int [,] grid, int depth , bool maxPlayer, int d){
         if(depth == 0){
+            return monotonicHeuristic(grid) + smoothnessHeuristic(grid) * 0.1f + Mathf.Log(emptySpaceHeuristic(grid)) * 2.7f + cornerHeuristic(grid);
+        }
+        if(maxPlayer){
             string gridString = "";
                 for(int ii = 3; ii >= 0; ii--){
                     for(int j = 0; j < 4; j++){
@@ -122,9 +125,6 @@ public class MiniMax : MonoBehaviour
                 }
                 Debug.Log(gridString);
                 Debug.Log(d);
-            return monotonicHeuristic(grid) + smoothnessHeuristic(grid) * 0.1f + Mathf.Log(emptySpaceHeuristic(grid)) * 2.7f + cornerHeuristic(grid);
-        }
-        if(maxPlayer){
             float heuristicValue = -1;
             float score = 0;
             for(int i = 0; i < 4; i++){

@@ -15,96 +15,80 @@ public class PieceMovementAi : MonoBehaviour
         if(this.GetComponent<FusionAI>().canMove(gridPositions, direction)){
             if(direction == Vector2.left){
                 for(int y = 0; y < 4; y++){
-                    int firstCompare = 0;
-                    int secondCompare = 0;
-                    int firstX = -1;
-                    int firstY = -1;
-                    int count = 0;
                     for(int x = 0; x < 4; x++){
                         if(gridPositions[x,y] != 0){
-                            if(count == 0){
-                                firstCompare = gridPositions[x,y];
-                                firstX = x;
-                                firstY = y;
-                                count++;
-                            }else if(count == 1){
-                                secondCompare = gridPositions[x,y];
-                                count = 0;
-                                int positionShift = x - firstX - 1;
-                                gridPositions[x - positionShift, y] = secondCompare;
-                                gridPositions[x,y] = 0;
+                            for(int i = x-1; i >= 0; i--){
+                                if(i >= 0){
+                                    if(gridPositions[i,y] != 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[i + 1,y] = tmp;
+                                    }else if(i == 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[i,y] = tmp;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }else if(direction == Vector2.right){
                 for(int y = 0; y < 4; y++){
-                    int firstCompare = 0;
-                    int secondCompare = 0;
-                    int firstX = -1;
-                    int firstY = -1;
-                    int count = 0;
                     for(int x = 3; x >= 0; x--){
                         if(gridPositions[x,y] != 0){
-                            if(count == 0){
-                                firstCompare = gridPositions[x,y];
-                                firstX = x;
-                                firstY = y;
-                                count++;
-                            }else if(count == 1){
-                                secondCompare = gridPositions[x,y];
-                                count = 0;
-                                int positionShift = x + firstX - 1;
-                                gridPositions[positionShift - x, y] = secondCompare;
-                                gridPositions[x,y] = 0;
+                            for(int i = x+1; i < 4; i++){
+                                if(i <= 3){
+                                    if(gridPositions[i,y] != 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[i - 1,y] = tmp;
+                                    }else if(i == 3){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[i,y] = tmp;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }else if(direction == Vector2.down){
                 for(int x = 0; x < 4; x++){
-                    int firstCompare = 0;
-                    int secondCompare = 0;
-                    int firstX = -1;
-                    int firstY = -1;
-                    int count = 0;
                     for(int y = 0; y < 4; y++){
                         if(gridPositions[x,y] != 0){
-                            if(count == 0){
-                                firstCompare = gridPositions[x,y];
-                                firstX = x;
-                                firstY = y;
-                                count++;
-                            }else if(count == 1){
-                                secondCompare = gridPositions[x,y];
-                                count = 0;
-                                int positionShift = y - firstY - 1;
-                                gridPositions[x, y - positionShift] = secondCompare;
-                                gridPositions[x,y] = 0;
+                            for(int i = y-1; i >= 0; i--){
+                                if(i >= 0){
+                                    if(gridPositions[x,i] != 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[x,i+1] = tmp;
+                                    }else if(i == 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[x,i] = tmp;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }else if(direction == Vector2.up){
                 for(int x = 0; x < 4; x++){
-                    int firstCompare = 0;
-                    int secondCompare = 0;
-                    int firstX = -1;
-                    int firstY = -1;
-                    int count = 0;
                     for(int y = 3; y >= 0; y--){
                         if(gridPositions[x,y] != 0){
-                            if(count == 0){
-                                firstCompare = gridPositions[x,y];
-                                firstX = x;
-                                firstY = y;
-                                count++;
-                            }else if(count == 1){
-                                secondCompare = gridPositions[x,y];
-                                count = 0;
-                                int positionShift = y + firstY - 1;
-                                gridPositions[x , positionShift - y] = secondCompare;
-                                gridPositions[x,y] = 0;
+                            for(int i = y+1; i < 4; i++){
+                                if(i <= 3){
+                                    if(gridPositions[x,i] != 0){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[x,i-1] = tmp;
+                                    }else if(i == 3){
+                                        int tmp = gridPositions[x,y];
+                                        gridPositions[x,y] = 0;
+                                        gridPositions[x,i] = tmp;
+                                    }
+                                }
                             }
                         }
                     }
