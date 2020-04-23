@@ -17,7 +17,7 @@ public class PieceManager : MonoBehaviour
     private bool canMove = true;
     private List<Vector3> previousList;
     public bool aiComplete;
-    private GameObject [,] initialGrid = new GameObject [4,4];
+    private int [,] initialGrid = new int [4,4];
     private int count;
     void Start()
     {
@@ -30,27 +30,28 @@ public class PieceManager : MonoBehaviour
         }
         tmp.transform.Find("Canvas/Text").transform.GetComponent<Text>().text = twoOrFour.ToString();
         tmp.transform.SetParent(grid.transform, false);
+        tmp.GetComponent<TileValue>().ChangeTileNum(twoOrFour);
         previousList = new List<Vector3>{new Vector3(100f,100f,100f)};
         aiComplete = true;
         count = 0;
-        initialGrid = new GameObject[4,4];
+        initialGrid = new int[4,4];
         foreach(Transform childTile in grid.transform){
             if(childTile.position.x < 0 && childTile.position.y < 0){
                 int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) - 1);
                 int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) - 1);
-                initialGrid[Mathf.Abs(positionX),Mathf.Abs(positionY)] = childTile.gameObject;
+                initialGrid[Mathf.Abs(positionX),Mathf.Abs(positionY)] = childTile.gameObject.transform.GetComponent<TileValue>().GetTileNum();
             }else if(childTile.position.x > 0 && childTile.position.y < 0){
                 int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) + 2);
                 int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) - 1);
-                initialGrid[positionX,Mathf.Abs(positionY)] = childTile.gameObject;
+                initialGrid[positionX,Mathf.Abs(positionY)] = childTile.gameObject.transform.GetComponent<TileValue>().GetTileNum();
             }else if(childTile.position.x < 0 && childTile.position.y > 0){
                 int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) - 1);
                 int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) + 2);
-                initialGrid[Mathf.Abs(positionX),positionY] = childTile.gameObject;
+                initialGrid[Mathf.Abs(positionX),positionY] = childTile.gameObject.transform.GetComponent<TileValue>().GetTileNum();
             }else if(childTile.position.x > 0 && childTile.position.y > 0){
                 int positionX = (int)(Mathf.Floor(Mathf.Abs(childTile.position.x)/2) + 2);
                 int positionY = (int)(Mathf.Floor(Mathf.Abs(childTile.position.y)/2) + 2);
-                initialGrid[positionX,positionY] = childTile.gameObject;
+                initialGrid[positionX,positionY] = childTile.gameObject.transform.GetComponent<TileValue>().GetTileNum();
             }
         }
     }
@@ -74,15 +75,18 @@ public class PieceManager : MonoBehaviour
             dirDown = true;
             canMove = false;
         }*/
+        if(Input.GetKeyDown(KeyCode.R)){
+            this.GetComponent<GameOver>().EndGame();
+        }
 
         if(aiComplete && canMove){
             canMove = false;
             aiComplete = false;
             Vector2 optimalMove;
             if(count == 0){
-                optimalMove = this.GetComponent<MiniMax>().bestMove(ref initialGrid);
+                optimalMove = this.GetComponent<MiniMax>().bestMove(initialGrid);
             }else{
-                optimalMove = this.GetComponent<MiniMax>().bestMove(ref this.GetComponent<Fusion>().gridPositions);
+                optimalMove = this.GetComponent<MiniMax>().bestMove(this.GetComponent<Fusion>().intGridPositions);
             }
             this.GetComponent<Fusion>().GridParse(optimalMove);
             if(optimalMove.Equals(Vector2.left)){
@@ -101,24 +105,25 @@ public class PieceManager : MonoBehaviour
         if(pieceCount == grid.transform.childCount){
             pieceCount = 0;
             if(dirLeft){
-                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(this.GetComponent<Fusion>().gridPositions);
                 dirLeft = false;
             }else if(dirRight){
-                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(this.GetComponent<Fusion>().gridPositions);
                 dirRight = false;
             }else if(dirDown){
-                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(this.GetComponent<Fusion>().gridPositions);
                 dirDown = false;
             }else if(dirUp){
-                CreatePiece(ref this.GetComponent<Fusion>().gridPositions);
+                CreatePiece(this.GetComponent<Fusion>().gridPositions);
                 dirUp = false;
             }
             canMove = true;
+            
         }
         
     }
     
-    public void CreatePiece(ref GameObject [,] piecePostion){
+    public void CreatePiece( GameObject [,] piecePostion){
         List<Vector3> emptyGridPositions = new List<Vector3> {
             new Vector3 (-3.75f,-3.75f, 10f),
             new Vector3 (-3.75f,-1.25f, 10f),
