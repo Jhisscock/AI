@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class FusionAI : MonoBehaviour
 {
     public GameObject grid;
-    public List<Vector3> emptyGridPositions = new List<Vector3>();
     public bool fusionFinishAi = false;
     public float score;
 
@@ -117,9 +116,12 @@ public class FusionAI : MonoBehaviour
                 }
             }
         }else{
-            score = -999999;
+            return score = 0;
         }
         fusionFinishAi = true;
+        if(score == 0){
+            return score;
+        }
         return score;
         
     }

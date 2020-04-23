@@ -20,9 +20,8 @@ public class PieceMovementAi : MonoBehaviour
                             for(int i = x-1; i >= 0; i--){
                                 if(i >= 0){
                                     if(gridPositions[i,y] != 0){
-                                        int tmp = gridPositions[x,y];
-                                        gridPositions[x,y] = 0;
-                                        gridPositions[i + 1,y] = tmp;
+                                        int moveDistance = i - x + 1;
+                                        gridPositions[moveDistance + x,y] = gridPositions[x,y];
                                     }else if(i == 0){
                                         int tmp = gridPositions[x,y];
                                         gridPositions[x,y] = 0;
@@ -40,9 +39,8 @@ public class PieceMovementAi : MonoBehaviour
                             for(int i = x+1; i < 4; i++){
                                 if(i <= 3){
                                     if(gridPositions[i,y] != 0){
-                                        int tmp = gridPositions[x,y];
-                                        gridPositions[x,y] = 0;
-                                        gridPositions[i - 1,y] = tmp;
+                                        int moveDistance = i - x - 1;
+                                        gridPositions[moveDistance + x,y] = gridPositions[x,y];
                                     }else if(i == 3){
                                         int tmp = gridPositions[x,y];
                                         gridPositions[x,y] = 0;
@@ -60,9 +58,8 @@ public class PieceMovementAi : MonoBehaviour
                             for(int i = y-1; i >= 0; i--){
                                 if(i >= 0){
                                     if(gridPositions[x,i] != 0){
-                                        int tmp = gridPositions[x,y];
-                                        gridPositions[x,y] = 0;
-                                        gridPositions[x,i+1] = tmp;
+                                        int moveDistance = i - y + 1;
+                                        gridPositions[x,moveDistance + y] = gridPositions[x,y];
                                     }else if(i == 0){
                                         int tmp = gridPositions[x,y];
                                         gridPositions[x,y] = 0;
@@ -80,9 +77,8 @@ public class PieceMovementAi : MonoBehaviour
                             for(int i = y+1; i < 4; i++){
                                 if(i <= 3){
                                     if(gridPositions[x,i] != 0){
-                                        int tmp = gridPositions[x,y];
-                                        gridPositions[x,y] = 0;
-                                        gridPositions[x,i-1] = tmp;
+                                        int moveDistance = i - y - 1;
+                                        gridPositions[x,moveDistance + y] = gridPositions[x,y];
                                     }else if(i == 3){
                                         int tmp = gridPositions[x,y];
                                         gridPositions[x,y] = 0;
